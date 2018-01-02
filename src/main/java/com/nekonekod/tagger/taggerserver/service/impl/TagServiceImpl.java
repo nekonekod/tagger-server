@@ -1,6 +1,7 @@
-package com.nekonekod.tagger.taggerserver.service;
+package com.nekonekod.tagger.taggerserver.service.impl;
 
 import com.google.common.collect.ImmutableMap;
+import com.nekonekod.tagger.taggerserver.service.TagService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 

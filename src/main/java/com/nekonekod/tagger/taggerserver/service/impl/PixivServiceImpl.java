@@ -1,10 +1,12 @@
-package com.nekonekod.tagger.taggerserver.service;
+package com.nekonekod.tagger.taggerserver.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nekonekod.tagger.taggerserver.constant.IllustSource;
 import com.nekonekod.tagger.taggerserver.entity.IllustCollection;
 import com.nekonekod.tagger.taggerserver.model.PixivRawHolder;
 import com.nekonekod.tagger.taggerserver.model.PixivRawModel;
+import com.nekonekod.tagger.taggerserver.service.PixivService;
+import com.nekonekod.tagger.taggerserver.service.TagService;
 import com.nekonekod.tagger.taggerserver.util.DateUtil;
 import com.nekonekod.tagger.taggerserver.util.FileUtil;
 import com.nekonekod.tagger.taggerserver.util.IdUtil;

@@ -1,5 +1,6 @@
 package com.nekonekod.tagger.taggerserver.db;
 
+import com.nekonekod.tagger.taggerserver.entity.IllustCollection;
 import io.jsondb.JsonDBTemplate;
 
 import java.io.File;
@@ -9,7 +10,7 @@ import java.nio.file.Paths;
  * @author duwenjun
  * @date 2017/12/21
  */
-public class JsonDbTemplate {
+public class JsonDBHelper {
 
     //Actual location on disk for database files, process should have read-write permissions to this folder
     private static String dbFilesLocation;

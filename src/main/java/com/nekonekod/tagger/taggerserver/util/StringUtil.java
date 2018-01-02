@@ -102,4 +102,10 @@ public class StringUtil {
         return true;
     }
 
+    public static String trimToNull(String str) {
+        if (isNullOrEmpty(str)) return null;
+        String trim = str.trim();
+        return isNullOrEmpty(trim) ? null : trim;
+    }
+
 }
