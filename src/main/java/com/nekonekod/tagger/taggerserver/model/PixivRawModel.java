@@ -15,5 +15,7 @@ public class PixivRawModel {
     private String title;
     private String date;
     private List<String> tags;
+    private String author;
+    private String authorId;
 
 }

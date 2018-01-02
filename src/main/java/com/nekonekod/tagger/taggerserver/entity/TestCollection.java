@@ -1,4 +1,4 @@
-package com.nekonekod.tagger.taggerserver.pojo;
+package com.nekonekod.tagger.taggerserver.entity;
 
 import com.nekonekod.tagger.taggerserver.constant.JsonDBConstant;
 import io.jsondb.annotation.Document;
@@ -6,7 +6,6 @@ import io.jsondb.annotation.Id;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author duwenjun

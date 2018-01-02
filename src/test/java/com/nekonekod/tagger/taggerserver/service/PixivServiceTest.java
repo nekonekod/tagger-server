@@ -1,5 +1,6 @@
 package com.nekonekod.tagger.taggerserver.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.nekonekod.tagger.taggerserver.util.FileUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,10 +25,20 @@ public class PixivServiceTest {
     private PixivService pixivService;
 
     @Test
-    public void testImportRawData() throws IOException {
-        Path path = Paths.get("data", "raw", "pixivs.json");
+    public void importRawData() throws IOException {
+        Path path = Paths.get("data", "raw", "test.json");
         String json = FileUtil.readFileToString(path.toFile(), Charset.defaultCharset());
-        pixivService.importRawData(json);
+        pixivService.parseRawData(json).forEach(m -> {
+            System.out.println(JSONObject.toJSONString(m));
+        });
+    }
+
+    @Test
+    public void renamePixivImageFiles() {
+        pixivService.renamePixivImageFiles(
+                Paths.get(System.getProperty("user.home"), "Downloads", "fsl").toFile(),
+                Paths.get(System.getProperty("user.home"), "Downloads", "fsl", "dup").toFile()
+        );
     }
 
 }

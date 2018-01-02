@@ -6,7 +6,7 @@ import java.util.UUID;
  * @author duwenjun
  * @date 2017/12/28
  */
-public class UuidUtil {
+public class IdUtil {
 
     /**
      * 生成UUID，大写

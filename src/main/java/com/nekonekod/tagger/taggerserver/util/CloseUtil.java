@@ -13,7 +13,7 @@ import java.io.IOException;
 public class CloseUtil {
 
     /**
-     * 关闭
+     * close method for closable
      *
      * @param closeables
      */
