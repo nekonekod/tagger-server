@@ -62,7 +62,7 @@ public class PixivServiceImpl implements PixivService {
             illust.setUpdateTime(new Date(Long.valueOf(m.getDate())));
             illust.setComment(null);
             illust.setTitle(m.getTitle());
-            illust.setFav(null);
+            illust.setFav(0);
             return illust;
         }).collect(Collectors.toList());
     }

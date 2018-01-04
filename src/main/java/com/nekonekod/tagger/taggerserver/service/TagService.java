@@ -9,7 +9,17 @@ import java.util.Map;
  */
 public interface TagService {
 
+    /**
+     * tag which will be ignored (to database)
+     *
+     * @return
+     */
     List<String> ignoreTags();
 
+    /**
+     * the key tag will be ignored but the value tag will be saved instead
+     *
+     * @return
+     */
     Map<String, String> reMapTags();
 }

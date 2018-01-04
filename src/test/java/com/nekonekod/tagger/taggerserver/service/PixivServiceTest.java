@@ -1,7 +1,7 @@
 package com.nekonekod.tagger.taggerserver.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.nekonekod.tagger.taggerserver.constant.IllustQueryOperator;
+import com.nekonekod.tagger.taggerserver.constant.JxQueryOperator;
 import com.nekonekod.tagger.taggerserver.entity.IllustCollection;
 import com.nekonekod.tagger.taggerserver.model.IllustQueryParam;
 import com.nekonekod.tagger.taggerserver.util.FileUtil;
@@ -56,11 +56,14 @@ public class PixivServiceTest {
     @Test
     public void searchByKeys() {
         IllustQueryParam param = new IllustQueryParam();
-        param.setSourceId("52131459");
-        param.setTags(Arrays.asList("Kancolle","百合"));
-        param.setFav(Arrays.asList(0));
-        List<IllustCollection> list = illustService.query(param, IllustQueryOperator.AND);
-        list.forEach(m -> System.out.println(JSONObject.toJSONString(m)));
+//        param.setSourceId("52131459");
+//        param.setTags(Arrays.asList("Kanco", "夕時雨"));
+//        param.setAuthor("トリエ");
+//        param.setAuthorId("10233886");
+//        param.setTitle("雨");
+//        param.setFav(Arrays.asList(1,2,3,4));
+        List<IllustCollection> list = illustService.query(param, JxQueryOperator.AND);
+        list.forEach(m -> System.out.println(m.getSourceId() + ":" + JSONObject.toJSONString(m.getTags())));
         System.out.println(list.size());
     }
 

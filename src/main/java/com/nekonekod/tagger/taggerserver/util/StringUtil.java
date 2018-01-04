@@ -4,12 +4,17 @@ import com.google.common.base.CaseFormat;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * @author duwenjun
  * @date 2017/12/28
  * @copyright sankuai.com
  */
 public class StringUtil {
+
+    public static final Pattern SEQ_FORMAT = Pattern.compile("\\{}");
 
     /**
      * abc_abc -> abcAbc
@@ -77,6 +82,10 @@ public class StringUtil {
         return Strings.isNullOrEmpty(str);
     }
 
+    public static boolean notNullOrEmpty(String str) {
+        return !Strings.isNullOrEmpty(str);
+    }
+
     public static String emptyToNull(String str) {
         return Strings.emptyToNull(str);
     }
@@ -108,4 +117,45 @@ public class StringUtil {
         return isNullOrEmpty(trim) ? null : trim;
     }
 
+    /**
+     * "NiHao","World" -> NiHao
+     * "","Hello" -> Hello
+     * null,"Hello" -> Hello
+     * @param str
+     * @param def
+     * @return
+     */
+    public static String notBlankElseDefault(String str, String def) {
+        return notNullOrEmpty(str) ? str : def;
+    }
+
+    /**
+     * seqFormat("Hello {},{}","World","Java") -> "Hello World,Java"
+     *
+     * @param message
+     * @param args
+     * @return
+     */
+    public static String seqFormat(String message, Object... args) {
+        if (isNullOrEmpty(message)) {
+            return "";
+        }
+        if (args == null || args.length == 0) {
+            return message;
+        }
+        Matcher m = SEQ_FORMAT.matcher(message);
+        int end = 0;
+        StringBuilder sb = new StringBuilder();
+        for (Object arg : args) {
+            if (!m.find()) {
+                break;
+            }
+            if (m.start() > 0) {
+                sb.append(message.substring(end, m.start()));
+            }
+            sb.append(arg == null ? "" : arg.toString());
+            end = m.end();
+        }
+        return sb.append(message.substring(end)).toString();
+    }
 }
