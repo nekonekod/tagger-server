@@ -1,12 +1,13 @@
 package com.nekonekod.tagger.taggerserver;
 
 import com.nekonekod.tagger.taggerserver.db.JsonDBHelper;
+import io.jsondb.annotation.Document;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Set;
+import java.util.Objects;
 
 /**
  * @author duwenjun
@@ -17,9 +18,15 @@ public class ApplicationHelper {
 
     @PostConstruct
     public void init() {
+        initJsonDb();
+    }
+
+    private void initJsonDb() {
         Reflections reflections = new Reflections("com.nekonekod.tagger.taggerserver.entity", new SubTypesScanner(false));
-        Set<Class<?>> collections = reflections.getSubTypesOf(Object.class);
-        collections.forEach(JsonDBHelper::initCollection);
+        reflections.getSubTypesOf(Object.class)
+                .stream()
+                .filter(cls -> Objects.nonNull(cls.getDeclaredAnnotation(Document.class)))
+                .forEach(JsonDBHelper::initCollection);
     }
 
 }

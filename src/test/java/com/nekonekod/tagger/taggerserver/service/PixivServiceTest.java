@@ -1,10 +1,13 @@
 package com.nekonekod.tagger.taggerserver.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.nekonekod.tagger.taggerserver.constant.JxQueryOperator;
-import com.nekonekod.tagger.taggerserver.entity.IllustCollection;
+import com.nekonekod.tagger.taggerserver.constant.QueryOperator;
+import com.nekonekod.tagger.taggerserver.entity.IllustEntity;
 import com.nekonekod.tagger.taggerserver.model.IllustQueryParam;
+import com.nekonekod.tagger.taggerserver.model.PagedList;
+import com.nekonekod.tagger.taggerserver.model.Paging;
 import com.nekonekod.tagger.taggerserver.util.FileUtil;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +27,7 @@ import java.util.List;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Ignore
 public class PixivServiceTest {
 
     @Resource
@@ -44,7 +48,7 @@ public class PixivServiceTest {
     public void importRawData() throws IOException {
         Path path = Paths.get("data", "raw", "pixivs.json");
         String json = FileUtil.readFileToString(path.toFile(), Charset.defaultCharset());
-        List<IllustCollection> illusts = pixivService.parseRawData(json);
+        List<IllustEntity> illusts = pixivService.parseRawData(json);
         illustService.saveBatch(illusts);
     }
 
@@ -57,14 +61,14 @@ public class PixivServiceTest {
     public void searchByKeys() {
         IllustQueryParam param = new IllustQueryParam();
 //        param.setSourceId("52131459");
-//        param.setTags(Arrays.asList("Kanco", "夕時雨"));
+        param.setTags(Arrays.asList("Kanco", "夕時雨"));
 //        param.setAuthor("トリエ");
 //        param.setAuthorId("10233886");
-//        param.setTitle("雨");
+        param.setTitle("雨");
 //        param.setFav(Arrays.asList(1,2,3,4));
-        List<IllustCollection> list = illustService.query(param, JxQueryOperator.AND);
-        list.forEach(m -> System.out.println(m.getSourceId() + ":" + JSONObject.toJSONString(m.getTags())));
-        System.out.println(list.size());
+        PagedList<IllustEntity> pagedList = illustService.query(param, QueryOperator.AND, new Paging(1, 5));
+        pagedList.getPageList().forEach(m -> System.out.println(m.getSourceId() + ":" + JSONObject.toJSONString(m.getTags())));
+        System.out.println(pagedList.getPage());
     }
 
     @Test

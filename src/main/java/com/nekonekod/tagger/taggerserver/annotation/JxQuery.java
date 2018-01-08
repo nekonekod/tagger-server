@@ -1,8 +1,9 @@
 package com.nekonekod.tagger.taggerserver.annotation;
 
-import com.nekonekod.tagger.taggerserver.constant.JxQueryMatcher;
-import com.nekonekod.tagger.taggerserver.constant.JxQueryOperator;
-import com.nekonekod.tagger.taggerserver.constant.JxQueryType;
+import com.nekonekod.tagger.taggerserver.constant.QueryMatcher;
+import com.nekonekod.tagger.taggerserver.constant.QueryOperator;
+import com.nekonekod.tagger.taggerserver.constant.QueryType;
+import com.nekonekod.tagger.taggerserver.db.JxQueryUtil;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,17 +11,23 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * annotation for building query
+ *
  * @author duwenjun
  * @date 2018/1/4
+ * @see com.nekonekod.tagger.taggerserver.db.SQLiteHelper
+ * @see JxQueryUtil
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JxQuery {
 
-    JxQueryType type() default JxQueryType.String;
+    String[] fieldName() default {};
 
-    JxQueryMatcher matcher();
+    QueryType type() default QueryType.String;
 
-    JxQueryOperator listOperator() default JxQueryOperator.NULL;
+    QueryMatcher matcher();
+
+    QueryOperator[] listOperator() default {};
 
 }

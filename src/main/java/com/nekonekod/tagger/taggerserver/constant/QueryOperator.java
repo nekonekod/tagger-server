@@ -4,13 +4,13 @@ package com.nekonekod.tagger.taggerserver.constant;
  * @author duwenjun
  * @date 2018/1/2
  */
-public enum JxQueryOperator {
+public enum QueryOperator {
 
-    AND(" and "), OR(" or "), NULL(null);
+    AND(" and "), OR(" or ");
 
     private String value;
 
-    JxQueryOperator(String value) {
+    QueryOperator(String value) {
         this.value = value;
     }
 

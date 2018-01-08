@@ -2,7 +2,7 @@ package com.nekonekod.tagger.taggerserver.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nekonekod.tagger.taggerserver.constant.IllustSource;
-import com.nekonekod.tagger.taggerserver.entity.IllustCollection;
+import com.nekonekod.tagger.taggerserver.entity.IllustEntity;
 import com.nekonekod.tagger.taggerserver.model.PixivRawHolder;
 import com.nekonekod.tagger.taggerserver.model.PixivRawModel;
 import com.nekonekod.tagger.taggerserver.service.PixivService;
@@ -39,10 +39,10 @@ public class PixivServiceImpl implements PixivService {
     private TagService tagService;
 
     @Override
-    public List<IllustCollection> parseRawData(String json) {
+    public List<IllustEntity> parseRawData(String json) {
         PixivRawHolder pixivRawHolder = JSONObject.parseObject(json, PixivRawHolder.class);
         return pixivRawHolder.getPixiv().parallelStream().map(m -> {
-            IllustCollection illust = new IllustCollection();
+            IllustEntity illust = new IllustEntity();
             if (cleanDirtyRaw) cleanDirtyRaw(m);
             illust.setId(IdUtil.genUUID());
             illust.setSource(IllustSource.PIXIV.getValue());
@@ -52,12 +52,13 @@ public class PixivServiceImpl implements PixivService {
             //tag
             Map<String, String> reMapTags = tagService.reMapTags();
             List<String> ignoreTags = tagService.ignoreTags();
-            String[] tags = m.getTags()
+            String tags = m.getTags() //"A","B","C" -> "$A$B$C$"
                     .stream()
                     .map(t -> reMapTags.getOrDefault(t, ignoreTags.contains(t) ? null : t))
                     .filter(Objects::nonNull)
+                    .map(t -> "$" + t + "$")
                     .distinct()
-                    .toArray(String[]::new);
+                    .collect(Collectors.joining());
             illust.setTags(tags);
             illust.setUpdateTime(new Date(Long.valueOf(m.getDate())));
             illust.setComment(null);

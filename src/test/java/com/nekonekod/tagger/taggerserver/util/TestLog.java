@@ -1,6 +1,6 @@
 package com.nekonekod.tagger.taggerserver.util;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -9,7 +9,7 @@ import org.junit.Test;
  * @date 2017/12/29
  */
 @Ignore
-@Slf4j
+@Log4j2
 public class TestLog {
 
 

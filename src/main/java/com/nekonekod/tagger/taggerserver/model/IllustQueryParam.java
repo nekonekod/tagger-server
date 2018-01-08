@@ -1,9 +1,9 @@
 package com.nekonekod.tagger.taggerserver.model;
 
 import com.nekonekod.tagger.taggerserver.annotation.JxQuery;
-import com.nekonekod.tagger.taggerserver.constant.JxQueryMatcher;
-import com.nekonekod.tagger.taggerserver.constant.JxQueryOperator;
-import com.nekonekod.tagger.taggerserver.constant.JxQueryType;
+import com.nekonekod.tagger.taggerserver.constant.QueryMatcher;
+import com.nekonekod.tagger.taggerserver.constant.QueryOperator;
+import com.nekonekod.tagger.taggerserver.constant.QueryType;
 import com.nekonekod.tagger.taggerserver.util.StringUtil;
 import lombok.Data;
 
@@ -20,21 +20,21 @@ import java.util.stream.Collectors;
 @Data
 public class IllustQueryParam {
 
-    @JxQuery(matcher = JxQueryMatcher.Equals)
+    @JxQuery(matcher = QueryMatcher.Equals)
     private String source;
-    @JxQuery(matcher = JxQueryMatcher.Equals)
+    @JxQuery(matcher = QueryMatcher.Equals)
     private String sourceId;
-    @JxQuery(matcher = JxQueryMatcher.Contains)
+    @JxQuery(matcher = QueryMatcher.Contains)
     private String author;
-    @JxQuery(matcher = JxQueryMatcher.Equals)
+    @JxQuery(matcher = QueryMatcher.Equals)
     private String authorId;
-    @JxQuery(matcher = JxQueryMatcher.Contains, listOperator = JxQueryOperator.AND)
+    @JxQuery(matcher = QueryMatcher.Contains, listOperator = QueryOperator.AND)
     private List<String> tags;
-    @JxQuery(matcher = JxQueryMatcher.Contains)
+    @JxQuery(matcher = QueryMatcher.Contains)
     private String comment;
-    @JxQuery(matcher = JxQueryMatcher.Contains)
+    @JxQuery(matcher = QueryMatcher.Contains)
     private String title;
-    @JxQuery(type = JxQueryType.Number, listOperator = JxQueryOperator.OR, matcher = JxQueryMatcher.Equals)
+    @JxQuery(type = QueryType.Number, listOperator = QueryOperator.OR, matcher = QueryMatcher.Equals)
     private List<Integer> fav;
 
     public IllustQueryParam selfClean() {

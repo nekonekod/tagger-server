@@ -1,6 +1,6 @@
 package com.nekonekod.tagger.taggerserver.service;
 
-import com.nekonekod.tagger.taggerserver.entity.IllustCollection;
+import com.nekonekod.tagger.taggerserver.entity.IllustEntity;
 
 import java.io.File;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface PixivService {
 
-    List<IllustCollection> parseRawData(String json);
+    List<IllustEntity> parseRawData(String json);
 
     /**
      * rename image files:
