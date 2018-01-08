@@ -1,9 +1,8 @@
 package com.nekonekod.tagger.taggerserver.model;
 
-import com.nekonekod.tagger.taggerserver.annotation.JxQuery;
+import com.nekonekod.tagger.taggerserver.annotation.WhereField;
 import com.nekonekod.tagger.taggerserver.constant.QueryMatcher;
 import com.nekonekod.tagger.taggerserver.constant.QueryOperator;
-import com.nekonekod.tagger.taggerserver.constant.QueryType;
 import com.nekonekod.tagger.taggerserver.util.StringUtil;
 import lombok.Data;
 
@@ -20,21 +19,21 @@ import java.util.stream.Collectors;
 @Data
 public class IllustQueryParam {
 
-    @JxQuery(matcher = QueryMatcher.Equals)
+    @WhereField(matcher = QueryMatcher.Equals)
     private String source;
-    @JxQuery(matcher = QueryMatcher.Equals)
+    @WhereField(matcher = QueryMatcher.Equals)
     private String sourceId;
-    @JxQuery(matcher = QueryMatcher.Contains)
+    @WhereField(matcher = QueryMatcher.Contains)
     private String author;
-    @JxQuery(matcher = QueryMatcher.Equals)
+    @WhereField(matcher = QueryMatcher.Equals)
     private String authorId;
-    @JxQuery(matcher = QueryMatcher.Contains, listOperator = QueryOperator.AND)
+    @WhereField(matcher = QueryMatcher.Contains, listOperator = QueryOperator.AND)
     private List<String> tags;
-    @JxQuery(matcher = QueryMatcher.Contains)
+    @WhereField(matcher = QueryMatcher.Contains)
     private String comment;
-    @JxQuery(matcher = QueryMatcher.Contains)
+    @WhereField(matcher = QueryMatcher.Contains)
     private String title;
-    @JxQuery(type = QueryType.Number, listOperator = QueryOperator.OR, matcher = QueryMatcher.Equals)
+    @WhereField(listOperator = QueryOperator.OR, matcher = QueryMatcher.Equals)
     private List<Integer> fav;
 
     public IllustQueryParam selfClean() {

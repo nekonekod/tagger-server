@@ -2,7 +2,6 @@ package com.nekonekod.tagger.taggerserver.annotation;
 
 import com.nekonekod.tagger.taggerserver.constant.QueryMatcher;
 import com.nekonekod.tagger.taggerserver.constant.QueryOperator;
-import com.nekonekod.tagger.taggerserver.constant.QueryType;
 import com.nekonekod.tagger.taggerserver.db.JxQueryUtil;
 
 import java.lang.annotation.ElementType;
@@ -20,14 +19,22 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface JxQuery {
+public @interface WhereField {
 
+    /**
+     * if null then use target's property name
+     *
+     * @return
+     */
     String[] fieldName() default {};
 
-    QueryType type() default QueryType.String;
+    QueryMatcher matcher() default QueryMatcher.Equals;
 
-    QueryMatcher matcher();
-
+    /**
+     * for collection field
+     *
+     * @return
+     */
     QueryOperator[] listOperator() default {};
 
 }

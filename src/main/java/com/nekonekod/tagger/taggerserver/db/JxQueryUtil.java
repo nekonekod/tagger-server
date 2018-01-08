@@ -1,9 +1,8 @@
 package com.nekonekod.tagger.taggerserver.db;
 
-import com.nekonekod.tagger.taggerserver.annotation.JxQuery;
+import com.nekonekod.tagger.taggerserver.annotation.WhereField;
 import com.nekonekod.tagger.taggerserver.constant.QueryMatcher;
 import com.nekonekod.tagger.taggerserver.constant.QueryOperator;
-import com.nekonekod.tagger.taggerserver.constant.QueryType;
 import com.nekonekod.tagger.taggerserver.util.ReflectUtil;
 import com.nekonekod.tagger.taggerserver.util.StringUtil;
 import lombok.extern.log4j.Log4j2;
@@ -19,7 +18,7 @@ import java.util.stream.Collectors;
  *
  * @author duwenjun
  * @date 2018/1/4
- * @see JxQuery
+ * @see WhereField
  */
 @Log4j2
 public class JxQueryUtil {
@@ -31,7 +30,7 @@ public class JxQueryUtil {
         String delimiter = Optional.ofNullable(operator).orElse(QueryOperator.OR).getValue();
         Field[] fields = clazz.getDeclaredFields();
         String query = Arrays.stream(fields).map(field -> {
-            JxQuery annotation = field.getDeclaredAnnotation(JxQuery.class);
+            WhereField annotation = field.getDeclaredAnnotation(WhereField.class);
             if (annotation == null) return null;
             String fName = annotation.fieldName().length == 0 ? field.getName() : annotation.fieldName()[0];
             Object value = ReflectUtil.getField(fName, arg);
@@ -43,39 +42,39 @@ public class JxQueryUtil {
         return query;
     }
 
-    private static String build(String field, Object value, JxQuery annotation) {
-        QueryType type = annotation.type();
+    private static String build(String field, Object value, WhereField annotation) {
         QueryMatcher matcher = annotation.matcher();
         if (annotation.listOperator().length > 0 && value instanceof Collection) {
             QueryOperator listOperator = annotation.listOperator()[0];
             //集合类型
             String q = ((Collection<?>) value).stream()
                     .distinct()
-                    .map(v -> String.format(listTemplate(matcher, type), field, v))
+                    .map(v -> String.format(listTemplate(matcher, v), field, v))
                     .collect(Collectors.joining(listOperator.getValue()));
             return StringUtil.isNullOrEmpty(q) ? null : " (" + q + ") ";
         } else {
-            return String.format(template(matcher, type), field, value);
+            return String.format(template(matcher, value), field, value);
         }
     }
 
-    private static String template(QueryMatcher matcher, QueryType type) {
+    private static String template(QueryMatcher matcher, Object v) {
         String format = "";
         if (matcher == QueryMatcher.Equals) {
-            format = type == QueryType.Number ? " %s=%d " : " %s='%s' ";
+            format = !(v instanceof CharSequence) ? " %s=%d " : " %s='%s' ";
         } else if (matcher == QueryMatcher.Contains) {
-            format = type == QueryType.Number ? " contains(%s,%d) " : " contains(%s,'%s') ";
+            format = !(v instanceof CharSequence) ? " contains(%s,%d) " : " contains(%s,'%s') ";
         }
         return format;
     }
 
-    private static String listTemplate(QueryMatcher matcher, QueryType type) {
+    private static String listTemplate(QueryMatcher matcher, Object v) {
         String format = "";
         if (matcher == QueryMatcher.Equals) {
-            format = type == QueryType.Number ? " contains(@%s,%d) " : " contains(@%s,'%s' )";
+            format = !(v instanceof CharSequence) ? " contains(@%s,%d) " : " contains(@%s,'%s' )";
         } else if (matcher == QueryMatcher.Contains) {
-            format = type == QueryType.Number ? " ./%s[contains(.,%d)] " : " ./%s[contains(.,'%s')] ";
+            format = !(v instanceof CharSequence) ? " ./%s[contains(.,%d)] " : " ./%s[contains(.,'%s')] ";
         }
         return format;
     }
+
 }

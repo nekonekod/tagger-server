@@ -11,7 +11,7 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.table.TableInfo;
 import com.j256.ormlite.table.TableUtils;
-import com.nekonekod.tagger.taggerserver.annotation.JxQuery;
+import com.nekonekod.tagger.taggerserver.annotation.WhereField;
 import com.nekonekod.tagger.taggerserver.constant.QueryMatcher;
 import com.nekonekod.tagger.taggerserver.constant.QueryOperator;
 import com.nekonekod.tagger.taggerserver.entity.IllustEntity;
@@ -98,7 +98,7 @@ public class SQLiteHelper {
      * build where statement
      *
      * @param builder        dao.queryBuilder /dao whereBuilder ...
-     * @param annotatedParam {@link JxQuery}
+     * @param annotatedParam {@link WhereField}
      * @param operator       {@link QueryOperator}
      * @param <T>            table type
      * @param <ID>           id type
@@ -108,7 +108,7 @@ public class SQLiteHelper {
         Where<T, ID> where = builder.where();
         Field[] fields = annotatedParam.getClass().getDeclaredFields();
         Long numClause = Arrays.stream(fields).map(field -> {
-            JxQuery annotation = field.getDeclaredAnnotation(JxQuery.class);
+            WhereField annotation = field.getDeclaredAnnotation(WhereField.class);
             if (annotation == null)
                 return null;
             Object value = ReflectUtil.getField(field.getName(), annotatedParam);
@@ -125,7 +125,7 @@ public class SQLiteHelper {
         return where;
     }
 
-    private <T, ID> void where(Where<T, ID> where, String name, Object value, JxQuery annotation) {
+    private <T, ID> void where(Where<T, ID> where, String name, Object value, WhereField annotation) {
         name = annotation.fieldName().length == 0 ? name : annotation.fieldName()[0];
         try {
             if (annotation.listOperator().length > 0 && annotation.listOperator()[0] == QueryOperator.AND) {
