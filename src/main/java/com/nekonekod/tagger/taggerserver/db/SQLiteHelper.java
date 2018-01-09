@@ -15,8 +15,10 @@ import com.nekonekod.tagger.taggerserver.annotation.WhereField;
 import com.nekonekod.tagger.taggerserver.constant.QueryMatcher;
 import com.nekonekod.tagger.taggerserver.constant.QueryOperator;
 import com.nekonekod.tagger.taggerserver.entity.IllustEntity;
+import com.nekonekod.tagger.taggerserver.entity.TagEntity;
 import com.nekonekod.tagger.taggerserver.exception.BusiLogicException;
 import com.nekonekod.tagger.taggerserver.util.CollectionUtil;
+import com.nekonekod.tagger.taggerserver.util.MutableReference;
 import com.nekonekod.tagger.taggerserver.util.ReflectUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -63,6 +65,7 @@ public class SQLiteHelper {
 
     private void install() throws SQLException {
         TableUtils.createTableIfNotExists(connectionSource, IllustEntity.class);
+        TableUtils.createTableIfNotExists(connectionSource, TagEntity.class);
     }
 
     /**
@@ -104,8 +107,8 @@ public class SQLiteHelper {
      * @param <ID>           id type
      * @return
      */
-    public <T, ID> Where buildWhere(QueryBuilder<T, ID> builder, Object annotatedParam, QueryOperator operator) {
-        Where<T, ID> where = builder.where();
+    public <T, ID> void buildAndSetWhere(QueryBuilder<T, ID> builder, Object annotatedParam, QueryOperator operator) {
+        MutableReference<Where<T, ID>> ref = MutableReference.empty();
         Field[] fields = annotatedParam.getClass().getDeclaredFields();
         Long numClause = Arrays.stream(fields).map(field -> {
             WhereField annotation = field.getDeclaredAnnotation(WhereField.class);
@@ -114,15 +117,18 @@ public class SQLiteHelper {
             Object value = ReflectUtil.getField(field.getName(), annotatedParam);
             if (value == null || (value instanceof Collection && CollectionUtil.isEmpty((Collection) value)))
                 return null;
-            where(where, field.getName(), value, annotation);
+            if (!ref.isPresent()) ref.set(builder.where());
+            where(ref.get(), field.getName(), value, annotation);
             return true;
         }).filter(Objects::nonNull).count();
-        if (operator == QueryOperator.AND) {
-            where.and(numClause.intValue());
-        } else if (operator == QueryOperator.OR) {
-            where.or(numClause.intValue());
+        if (numClause > 0) {
+            if (operator == QueryOperator.AND) {
+                ref.get().and(numClause.intValue());
+            } else if (operator == QueryOperator.OR) {
+                ref.get().or(numClause.intValue());
+            }
+            builder.setWhere(ref.get());
         }
-        return where;
     }
 
     private <T, ID> void where(Where<T, ID> where, String name, Object value, WhereField annotation) {

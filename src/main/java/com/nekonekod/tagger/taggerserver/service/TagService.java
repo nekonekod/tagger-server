@@ -10,6 +10,21 @@ import java.util.Map;
 public interface TagService {
 
     /**
+     * add ignore
+     *
+     * @param name
+     */
+    void addIgnore(String name);
+
+    /**
+     * add reMap name -> mapTp
+     *
+     * @param name
+     * @param mapTo
+     */
+    void addReMap(String name, String mapTo);
+
+    /**
      * tag which will be ignored (to database)
      *
      * @return
@@ -17,9 +32,16 @@ public interface TagService {
     List<String> ignoreTags();
 
     /**
-     * the key tag will be ignored but the value tag will be saved instead
+     * the {key} tag will be ignored but the {value} tag will be saved instead
      *
      * @return
      */
     Map<String, String> reMapTags();
+
+    /**
+     * remove by name
+     *
+     * @param name
+     */
+    void remove(String name);
 }

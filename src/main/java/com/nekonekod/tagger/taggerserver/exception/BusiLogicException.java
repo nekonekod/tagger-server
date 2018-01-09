@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -187,5 +188,14 @@ public class BusiLogicException extends RuntimeException {
             LOG.warn("rethrow untouched for {}", msg, e);
             throw e;
         }
+    }
+
+    public static void checkNotNull(String msg, Object... objs) {
+        for (Object obj : objs) {
+            if (Objects.isNull(obj)) {
+                throw BusiLogicException.create(new NullPointerException("null")).init(msg);
+            }
+        }
+
     }
 }

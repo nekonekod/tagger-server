@@ -4,8 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.nekonekod.tagger.taggerserver.constant.QueryOperator;
 import com.nekonekod.tagger.taggerserver.entity.IllustEntity;
 import com.nekonekod.tagger.taggerserver.model.IllustQueryParam;
-import com.nekonekod.tagger.taggerserver.model.PagedList;
-import com.nekonekod.tagger.taggerserver.model.Paging;
 import com.nekonekod.tagger.taggerserver.util.FileUtil;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -61,14 +59,14 @@ public class PixivServiceTest {
     public void searchByKeys() {
         IllustQueryParam param = new IllustQueryParam();
 //        param.setSourceId("52131459");
-        param.setTags(Arrays.asList("Kanco", "夕時雨"));
+//        param.setTags(Arrays.asList("夕時雨"));
 //        param.setAuthor("トリエ");
 //        param.setAuthorId("10233886");
-        param.setTitle("雨");
+//        param.setTitle("雨");
 //        param.setFav(Arrays.asList(1,2,3,4));
-        PagedList<IllustEntity> pagedList = illustService.query(param, QueryOperator.AND, new Paging(1, 5));
-        pagedList.getPageList().forEach(m -> System.out.println(m.getSourceId() + ":" + JSONObject.toJSONString(m.getTags())));
-        System.out.println(pagedList.getPage());
+        param.setOperator(QueryOperator.AND);
+        List<IllustEntity> pagedList = illustService.query(param);
+        pagedList.forEach(m -> System.out.println(m.getSourceId() + ":" + JSONObject.toJSONString(m.getTags())));
     }
 
     @Test

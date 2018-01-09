@@ -19,6 +19,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -44,7 +46,7 @@ public class FsWatcher {
         dirs = new ConcurrentHashMap<>(100);
         try {
             watcher = FileSystems.getDefault().newWatchService();
-            Thread thread = new Thread(this::watch, "FsWatcher.watch");
+            Thread thread = new Thread(this::watch, "FsWatcher.start");
             thread.setDaemon(true);
             thread.start();
         } catch (Exception e) {
@@ -65,8 +67,31 @@ public class FsWatcher {
     public List<Path> search(String fileName) {
         if (StringUtil.isNullOrEmpty(fileName)) return Collections.emptyList();
         return Collections.list(dirs.keys())
-                .parallelStream() //每个dir并行查找其fileSet
+                .parallelStream()
                 .map(key -> fileSet(key).map(set -> set.stream().filter(path -> path.getFileName().toString().contains(fileName)).collect(Collectors.toList())).orElse(Collections.emptyList()))
+                .flatMap(List::stream)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    public List<Path> search(List<String> fileNames) {
+        return searchThenMap(fileNames, Function.identity(), (string, path) -> path);
+    }
+
+    public <T, R> List<R> searchThenMap(List<T> src, Function<T, String> keyGen, BiFunction<T, Path, R> mapper) {
+        if (CollectionUtil.isEmpty(src)) return Collections.emptyList();
+        return Collections.list(dirs.keys())
+                .parallelStream()
+                .map(key -> fileSet(key).map(set -> {
+                    //dir并行查找其fileSet
+                    return set.stream().map(path -> {
+                        // match any of fileNames
+                        return src.stream().filter(t -> {
+                            String fName = keyGen.apply(t);
+                            return path.getFileName().toString().contains(fName);
+                        }).findAny().map(t -> mapper.apply(t, path)).orElse(null);
+                    }).filter(Objects::nonNull).collect(Collectors.toList());
+                }).orElse(Collections.emptyList()))
                 .flatMap(List::stream)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -162,7 +187,7 @@ public class FsWatcher {
     private void print() {
         System.out.println("\n============================\n");
         dirs.forEach((dir, files) -> {
-            String struct = dir + files.stream().map(Path::toString).collect(Collectors.joining("\n\t|-"));
+            String struct = dir + "\n\t|-" + files.stream().map(Path::toString).collect(Collectors.joining("\n\t|-"));
             System.out.println(struct);
         });
         System.out.println("\n============================\n");

@@ -2,8 +2,6 @@ package com.nekonekod.tagger.taggerserver.service.impl;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.stmt.Where;
-import com.nekonekod.tagger.taggerserver.constant.QueryOperator;
 import com.nekonekod.tagger.taggerserver.db.SQLiteHelper;
 import com.nekonekod.tagger.taggerserver.entity.IllustEntity;
 import com.nekonekod.tagger.taggerserver.exception.BusiLogicException;
@@ -47,13 +45,11 @@ public class IllustServiceImpl implements IllustService {
         }
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public PagedList<IllustEntity> query(IllustQueryParam param, QueryOperator operator, Paging paging) {
+    private PagedList<IllustEntity> query(IllustQueryParam param, Paging paging) {
         param.selfClean();
         QueryBuilder<IllustEntity, String> builder = illustDao.queryBuilder();
-        Where<IllustEntity, String> where = sqLiteHelper.buildWhere(builder, param, operator);
-        builder.setWhere(where);
+        sqLiteHelper.buildAndSetWhere(builder, param, param.getOperator());
         builder.orderBy("id", true);
         try {
             Long count = builder.countOf();
@@ -70,8 +66,8 @@ public class IllustServiceImpl implements IllustService {
     }
 
     @Override
-    public List<IllustEntity> query(IllustQueryParam param, QueryOperator operator) {
-        return query(param, operator, new Paging(1, Integer.MAX_VALUE)).getPageList();
+    public List<IllustEntity> query(IllustQueryParam param) {
+        return query(param, new Paging(1, Integer.MAX_VALUE)).getPageList();
     }
 
     @Override

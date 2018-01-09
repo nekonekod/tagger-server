@@ -36,6 +36,8 @@ public class IllustQueryParam {
     @WhereField(listOperator = QueryOperator.OR, matcher = QueryMatcher.Equals)
     private List<Integer> fav;
 
+    private QueryOperator operator;
+
     public IllustQueryParam selfClean() {
         this.source = StringUtil.trimToNull(this.source);
         this.sourceId = StringUtil.trimToNull(this.sourceId);
