@@ -9,6 +9,7 @@ import com.nekonekod.tagger.taggerserver.model.IllustQueryParam;
 import com.nekonekod.tagger.taggerserver.model.PagedList;
 import com.nekonekod.tagger.taggerserver.model.Paging;
 import com.nekonekod.tagger.taggerserver.service.IllustService;
+import com.nekonekod.tagger.taggerserver.service.TagService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author duwenjun
@@ -24,6 +26,9 @@ import java.util.List;
 @Log4j2
 @Service
 public class IllustServiceImpl implements IllustService {
+
+    @Resource
+    private TagService tagService;
 
     @Resource
     private SQLiteHelper sqLiteHelper;
@@ -36,7 +41,7 @@ public class IllustServiceImpl implements IllustService {
     }
 
     @Override
-    public void saveBatch(List<IllustEntity> illusts) {
+    public void save(List<IllustEntity> illusts) {
         try {
             illustDao.create(illusts);
         } catch (SQLException e) {
@@ -74,6 +79,23 @@ public class IllustServiceImpl implements IllustService {
     public void removeAll() {
         try {
             illustDao.deleteBuilder().delete();
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            throw BusiLogicException.create(e);
+        }
+    }
+
+    @Override
+    public void updateTags() {
+        try {
+            List<IllustEntity> all = illustDao.queryForAll();
+            for (IllustEntity illust : all) {
+                String newTag = tagService.updateTagString(illust.getTags());
+                if (!Objects.equals(newTag, illust.getTags())) {
+                    illust.setTags(newTag);
+                    illustDao.update(illust);
+                }
+            }
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
             throw BusiLogicException.create(e);

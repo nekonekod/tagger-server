@@ -44,4 +44,10 @@ public interface TagService {
      * @param name
      */
     void remove(String name);
+
+    List<String> updateTags(List<String> src);
+
+    String updateTagString(String src);
+
+    String updateTagString(List<String> src);
 }

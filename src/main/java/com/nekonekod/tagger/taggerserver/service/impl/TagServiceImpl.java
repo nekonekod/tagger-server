@@ -5,6 +5,7 @@ import com.nekonekod.tagger.taggerserver.db.SQLiteHelper;
 import com.nekonekod.tagger.taggerserver.entity.TagEntity;
 import com.nekonekod.tagger.taggerserver.exception.BusiLogicException;
 import com.nekonekod.tagger.taggerserver.service.TagService;
+import com.nekonekod.tagger.taggerserver.util.StringUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -13,10 +14,12 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * tag business logic
@@ -122,4 +125,40 @@ public class TagServiceImpl implements TagService {
             throw BusiLogicException.create(e);
         }
     }
+
+    @Override
+    public List<String> updateTags(List<String> src) {
+        BusiLogicException.checkNotNull(null, src);
+        return mUpdateTags(src).collect(Collectors.toList());
+    }
+
+    @Override
+    public String updateTagString(String src) {
+        BusiLogicException.checkNotNull(null, src);
+        List<String> list = Arrays.asList(("$" + src + "$").split("\\$\\$"));
+        return mUpdateTags(list)
+                .map(t -> "$" + t + "$")
+                .collect(Collectors.joining());
+    }
+
+    @Override
+    public String updateTagString(List<String> src) {
+        BusiLogicException.checkNotNull(null, src);
+        return mUpdateTags(src)
+                .map(t -> "$" + t + "$")
+                .collect(Collectors.joining());
+    }
+
+    private Stream<String> mUpdateTags(List<String> src) {
+        Map<String, String> reMapTags = reMapTags();
+        List<String> ignoreTags = ignoreTags();
+        return src //"A","B","C" -> "$A$B$C$"
+                .stream()
+                .filter(StringUtil::notNullOrEmpty)
+                .map(t -> reMapTags.getOrDefault(t, ignoreTags.contains(t) ? null : t))
+                .filter(Objects::nonNull)
+                .distinct();
+    }
+
+
 }

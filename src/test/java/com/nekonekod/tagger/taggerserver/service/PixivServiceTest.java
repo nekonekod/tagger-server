@@ -5,7 +5,6 @@ import com.nekonekod.tagger.taggerserver.constant.QueryOperator;
 import com.nekonekod.tagger.taggerserver.entity.IllustEntity;
 import com.nekonekod.tagger.taggerserver.model.IllustQueryParam;
 import com.nekonekod.tagger.taggerserver.util.FileUtil;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,7 +15,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,7 +23,7 @@ import java.util.List;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@Ignore
+//@Ignore
 public class PixivServiceTest {
 
     @Resource
@@ -47,7 +45,7 @@ public class PixivServiceTest {
         Path path = Paths.get("data", "raw", "pixivs.json");
         String json = FileUtil.readFileToString(path.toFile(), Charset.defaultCharset());
         List<IllustEntity> illusts = pixivService.parseRawData(json);
-        illustService.saveBatch(illusts);
+        illustService.save(illusts);
     }
 
     @Test
@@ -77,4 +75,8 @@ public class PixivServiceTest {
         );
     }
 
+    @Test
+    public void updateTags() {
+        illustService.updateTags();
+    }
 }

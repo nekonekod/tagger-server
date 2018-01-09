@@ -20,7 +20,6 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -49,17 +48,7 @@ public class PixivServiceImpl implements PixivService {
             illust.setSourceId(m.getId());
             illust.setAuthor(m.getAuthor());
             illust.setAuthorId(m.getAuthorId());
-            //tag
-            Map<String, String> reMapTags = tagService.reMapTags();
-            List<String> ignoreTags = tagService.ignoreTags();
-            String tags = m.getTags() //"A","B","C" -> "$A$B$C$"
-                    .stream()
-                    .map(t -> reMapTags.getOrDefault(t, ignoreTags.contains(t) ? null : t))
-                    .filter(Objects::nonNull)
-                    .map(t -> "$" + t + "$")
-                    .distinct()
-                    .collect(Collectors.joining());
-            illust.setTags(tags);
+            illust.setTags(tagService.updateTagString(m.getTags()));
             illust.setUpdateTime(new Date(Long.valueOf(m.getDate())));
             illust.setComment(null);
             illust.setTitle(m.getTitle());
