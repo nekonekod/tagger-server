@@ -2,6 +2,7 @@ package com.nekonekod.tagger.taggerserver.web.controller;
 
 import com.nekonekod.tagger.taggerserver.exception.BusiLogicException;
 import com.nekonekod.tagger.taggerserver.util.AjaxResultUtil;
+import lombok.extern.log4j.Log4j2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -14,9 +15,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import javax.servlet.http.HttpServletRequest;
 
 @ControllerAdvice
+@Log4j2
 class GlobalControllerExceptionHandler {
-    private static Logger LOG = LoggerFactory.getLogger(GlobalControllerExceptionHandler.class);
-
 
     /**
      * This method handles the BusiLogicException
@@ -32,14 +32,14 @@ class GlobalControllerExceptionHandler {
     public Object handleBusiLogicException(HttpServletRequest request, Exception ex) {
         if (ex instanceof BusiLogicException) {
             BusiLogicException busiLogicException = (BusiLogicException) ex;
-            LOG.warn("Got BusiLogicException when handling[{}]:\n[{}]", request.getRequestURL(), busiLogicException.getAjaxMsg(), ex);
+            log.warn("Got BusiLogicException when handling[{}]:\n[{}]", request.getRequestURL(), busiLogicException.getAjaxMsg(), ex);
             return AjaxResultUtil.fail(busiLogicException.getAjaxMsg());
         }
         if (ex instanceof HttpMessageNotReadableException) {
-            LOG.error("参数格式错误", ex);
+            log.error("参数格式错误", ex);
             return AjaxResultUtil.fail("参数格式错误");
         }
-        LOG.error("服务器异常", ex);
+        log.error("服务器异常", ex);
         return AjaxResultUtil.fail("服务器异常");
     }
 }

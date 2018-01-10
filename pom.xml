@@ -25,6 +25,8 @@
     </properties>
 
     <dependencies>
+
+        <!-- spring boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -120,6 +122,8 @@
             <scope>provided</scope>
         </dependency>
 
+
+        <!-- ormlite -->
         <dependency>
             <groupId>com.j256.ormlite</groupId>
             <artifactId>ormlite-core</artifactId>
@@ -132,12 +136,19 @@
             <version>5.0</version>
         </dependency>
 
+        <!-- sqlite -->
         <dependency>
-        <groupId>org.xerial</groupId>
-        <artifactId>sqlite-jdbc</artifactId>
-        <version>3.21.0.1</version>
-    </dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.21.0.1</version>
+        </dependency>
 
+        <!-- jphash -->
+        <dependency>
+            <groupId>com.pragone</groupId>
+            <artifactId>jpHash</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -145,6 +156,17 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <fork>true</fork>
+                </configuration>
+                <dependencies>
+                    <!-- spring热部署-->
+                    <dependency>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>springloaded</artifactId>
+                        <version>1.2.6.RELEASE</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

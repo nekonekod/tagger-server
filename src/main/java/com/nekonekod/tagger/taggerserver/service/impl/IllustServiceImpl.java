@@ -52,7 +52,6 @@ public class IllustServiceImpl implements IllustService {
 
     @SuppressWarnings("unchecked")
     private PagedList<IllustEntity> query(IllustQueryParam param, Paging paging) {
-        param.selfClean();
         QueryBuilder<IllustEntity, String> builder = illustDao.queryBuilder();
         sqLiteHelper.buildAndSetWhere(builder, param, param.getOperator());
         builder.orderBy("id", true);

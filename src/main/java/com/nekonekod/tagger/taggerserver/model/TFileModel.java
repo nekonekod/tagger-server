@@ -1,10 +1,14 @@
 package com.nekonekod.tagger.taggerserver.model;
 
+import com.nekonekod.tagger.taggerserver.entity.IllustEntity;
+import com.nekonekod.tagger.taggerserver.util.TagFormat;
 import lombok.Builder;
 import lombok.Data;
 
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author duwenjun
@@ -27,4 +31,21 @@ public class TFileModel {
     private String title;
     private Integer fav;
 
+
+    public static TFileModel fromIllustAndPath(IllustEntity illust, Path path) {
+        if (Objects.isNull(illust) || Objects.isNull(path)) return null;
+        return TFileModel.builder()
+                .fileName(path.toFile().getName())
+                .path(path.toString())
+                .illustId(illust.getId())
+                .source(illust.getSource())
+                .sourceId(illust.getSourceId())
+                .author(illust.getAuthor())
+                .author(illust.getAuthorId())
+                .tags(TagFormat.fromTagString(illust.getTags()))
+                .updateTime(illust.getUpdateTime())
+                .comment(illust.getComment())
+                .title(illust.getTitle())
+                .build();
+    }
 }

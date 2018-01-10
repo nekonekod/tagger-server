@@ -6,6 +6,7 @@ import com.nekonekod.tagger.taggerserver.entity.TagEntity;
 import com.nekonekod.tagger.taggerserver.exception.BusiLogicException;
 import com.nekonekod.tagger.taggerserver.service.TagService;
 import com.nekonekod.tagger.taggerserver.util.StringUtil;
+import com.nekonekod.tagger.taggerserver.util.TagFormat;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -135,8 +135,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public String updateTagString(String src) {
         BusiLogicException.checkNotNull(null, src);
-        List<String> list = Arrays.asList(("$" + src + "$").split("\\$\\$"));
-        return mUpdateTags(list)
+        return mUpdateTags(TagFormat.fromTagString(src))
                 .map(t -> "$" + t + "$")
                 .collect(Collectors.joining());
     }

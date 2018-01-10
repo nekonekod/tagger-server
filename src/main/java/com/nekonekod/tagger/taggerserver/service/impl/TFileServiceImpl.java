@@ -3,7 +3,6 @@ package com.nekonekod.tagger.taggerserver.service.impl;
 import com.nekonekod.tagger.taggerserver.entity.IllustEntity;
 import com.nekonekod.tagger.taggerserver.model.IllustQueryParam;
 import com.nekonekod.tagger.taggerserver.model.TFileModel;
-import com.nekonekod.tagger.taggerserver.model.assembly.TFileAssembly;
 import com.nekonekod.tagger.taggerserver.service.IllustService;
 import com.nekonekod.tagger.taggerserver.service.TFileService;
 import com.nekonekod.tagger.taggerserver.util.FsWatcher;
@@ -31,7 +30,7 @@ public class TFileServiceImpl implements TFileService {
         return FsWatcher.getInstance().searchThenMap(
                 illusts, //illust matched query
                 IllustEntity::getSourceId, //key for search
-                TFileAssembly::fromIllustAndPath); //build TFile
+                TFileModel::fromIllustAndPath); //build TFile
     }
 
 

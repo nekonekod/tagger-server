@@ -1,8 +1,9 @@
 package com.nekonekod.tagger.taggerserver.web.controller;
 
-import com.nekonekod.tagger.taggerserver.model.TagParam;
+import com.nekonekod.tagger.taggerserver.dto.TagDto;
 import com.nekonekod.tagger.taggerserver.service.TagService;
 import com.nekonekod.tagger.taggerserver.util.AjaxResultUtil;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,7 @@ import javax.annotation.Resource;
  * @author duwenjun
  * @date 2018/1/3
  */
+@Log4j2
 @RestController
 @RequestMapping("tag")
 public class TagController {
@@ -22,16 +24,16 @@ public class TagController {
     @Resource
     private TagService tagService;
 
-    @RequestMapping("addIgnore")
-    public Object addIgnore(@RequestBody TagParam param) {
+    @RequestMapping("saveIgnore")
+    public Object addIgnore(@RequestBody TagDto param) {
         tagService.addIgnore(param.getName());
-        return AjaxResultUtil.success("添加成功");
+        return AjaxResultUtil.success("保存成功");
     }
 
-    @RequestMapping("addReMap")
-    public Object addReMap(@RequestBody TagParam param) {
+    @RequestMapping("saveReMap")
+    public Object addReMap(@RequestBody TagDto param) {
         tagService.addReMap(param.getName(), param.getMapTo());
-        return AjaxResultUtil.success("添加成功");
+        return AjaxResultUtil.success("保存成功");
     }
 
     @RequestMapping("ignored")
@@ -45,7 +47,7 @@ public class TagController {
     }
 
     @RequestMapping("remove")
-    public Object remove(@RequestBody TagParam param) {
+    public Object remove(@RequestBody TagDto param) {
         tagService.remove(param.getName());
         return AjaxResultUtil.success("删除成功");
     }

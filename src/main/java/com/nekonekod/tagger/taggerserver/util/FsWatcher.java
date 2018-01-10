@@ -40,7 +40,7 @@ public class FsWatcher {
     private WatchEvent.Modifier modifier = SensitivityWatchEventModifier.HIGH;
 
     private WatchService watcher;
-    private ConcurrentHashMap<Path, Set<Path>> dirs;
+    private ConcurrentHashMap<Path, Set<Path>> dirs; //TODO key use string
 
     private FsWatcher() {
         dirs = new ConcurrentHashMap<>(100);
@@ -124,7 +124,40 @@ public class FsWatcher {
     }
 
     public void unregisterDir(File dir) {
-        dirs.remove(dir);
+        if (Objects.nonNull(dir) && dir.exists() && dir.isDirectory()) {
+            File[] files = dir.listFiles();
+            if (files != null) Arrays.stream(files).forEach(this::removeDir);
+            removeDir(dir);
+            print();
+        } else {
+            log.warn("{} 不是文件夹", dir);
+        }
+    }
+
+
+    /**
+     * 监听着的文件夹
+     *
+     * @return
+     */
+    public List<String> watchedDir() {
+        return Collections.list(dirs.keys()).stream().map(Path::toString).collect(Collectors.toList());
+    }
+
+    /**
+     * dirs中移除key，不遍历子文件夹
+     */
+    private void removeDir(File dir) {
+        if (Objects.nonNull(dir) && dir.exists() && dir.isDirectory()) {
+            Collections.list(dirs.keys())
+                    .stream()
+                    .filter(p -> p.toString().equals(dir.toPath().toString()))
+                    .findAny()
+                    .ifPresent(key -> {
+                        log.info("findAny key:{}", key);
+                        dirs.remove(key);
+                    });
+        }
     }
 
     /**
@@ -133,7 +166,7 @@ public class FsWatcher {
      * @param dir
      * @param file
      */
-    public void addFile(Path dir, File file) {
+    private void addFile(Path dir, File file) {
         if (Objects.nonNull(file) && file.exists() && file.isFile())
             fileSet(dir).ifPresent(set -> set.add(file.toPath()));
     }
@@ -144,7 +177,7 @@ public class FsWatcher {
      * @param dir
      * @param file
      */
-    public void removeFile(Path dir, File file) {
+    private void removeFile(Path dir, File file) {
         if (Objects.nonNull(file) && file.exists() && file.isFile())
             fileSet(dir).ifPresent(set -> set.remove(file.toPath()));
     }
@@ -184,15 +217,6 @@ public class FsWatcher {
         }
     }
 
-    private void print() {
-        System.out.println("\n============================\n");
-        dirs.forEach((dir, files) -> {
-            String struct = dir + "\n\t|-" + files.stream().map(Path::toString).collect(Collectors.joining("\n\t|-"));
-            System.out.println(struct);
-        });
-        System.out.println("\n============================\n");
-    }
-
     /**
      * 是否监听此文件夹
      *
@@ -212,6 +236,18 @@ public class FsWatcher {
      */
     private Optional<Set<Path>> fileSet(Path dir) {
         return isWatched(dir).map(dirs::get);
+    }
+
+    private void print() {
+        StringBuilder builder = new StringBuilder();
+        dirs.forEach((dir, files) -> {
+            String d = dir.toString() + "\n";
+            String f = "\t|-" + files.stream().map(Path::toString).collect(Collectors.joining("\n\t|-"));
+            builder.append(d);//.append(f);
+        });
+        log.info("\n============================\n" +
+                "{}" +
+                "\n============================\n", builder.toString());
     }
 
     private enum SingletonHolder {

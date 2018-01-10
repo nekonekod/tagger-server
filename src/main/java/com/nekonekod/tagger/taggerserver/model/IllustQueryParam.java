@@ -3,6 +3,7 @@ package com.nekonekod.tagger.taggerserver.model;
 import com.nekonekod.tagger.taggerserver.annotation.WhereField;
 import com.nekonekod.tagger.taggerserver.constant.QueryMatcher;
 import com.nekonekod.tagger.taggerserver.constant.QueryOperator;
+import com.nekonekod.tagger.taggerserver.dto.IllustQueryDto;
 import com.nekonekod.tagger.taggerserver.util.StringUtil;
 import lombok.Data;
 
@@ -38,21 +39,27 @@ public class IllustQueryParam {
 
     private QueryOperator operator;
 
-    public IllustQueryParam selfClean() {
-        this.source = StringUtil.trimToNull(this.source);
-        this.sourceId = StringUtil.trimToNull(this.sourceId);
-        this.author = StringUtil.trimToNull(this.author);
-        this.authorId = StringUtil.trimToNull(this.authorId);
-        if (Objects.isNull(this.tags)) this.tags = Collections.emptyList();
-        this.tags = Optional.ofNullable(this.tags.stream()
+    public static IllustQueryParam fromIllustQueryDto(IllustQueryDto dto) {
+        IllustQueryParam param = new IllustQueryParam();
+        param.source = StringUtil.trimToNull(dto.getSource());
+        param.sourceId = StringUtil.trimToNull(dto.getSourceId());
+        param.author = StringUtil.trimToNull(dto.getAuthor());
+        param.authorId = StringUtil.trimToNull(dto.getAuthorId());
+        if (Objects.isNull(dto.getTags())) param.tags = Collections.emptyList();
+        else param.tags = dto.getTags();
+        param.tags = Optional.ofNullable(param.tags.stream()
                 .map(StringUtil::trimToNull)
                 .filter(Objects::nonNull)
                 .distinct()
                 .collect(Collectors.toList())
         ).orElse(Collections.emptyList());
-        this.comment = StringUtil.trimToNull(this.comment);
-        this.title = StringUtil.trimToNull(this.title);
-        if (Objects.isNull(this.fav)) this.fav = Collections.emptyList();
-        return this;
+        param.comment = StringUtil.trimToNull(dto.getComment());
+        param.title = StringUtil.trimToNull(dto.getTitle());
+        if (Objects.isNull(dto.getFav())) param.fav = Collections.emptyList();
+        else param.fav = dto.getFav();
+        param.operator = Optional.ofNullable(dto.getQueryOperator())
+                .map(QueryOperator::valueOf)
+                .orElse(QueryOperator.AND);
+        return param;
     }
 }

@@ -1,7 +1,9 @@
 package com.nekonekod.tagger.taggerserver.model;
 
-import com.j256.ormlite.field.DatabaseField;
+import com.nekonekod.tagger.taggerserver.dto.TagDto;
 import lombok.Data;
+
+import java.util.Optional;
 
 /**
  * @author duwenjun
@@ -10,9 +12,20 @@ import lombok.Data;
 @Data
 public class TagParam {
 
-
-    @DatabaseField(id = true)
     private String name;
-    @DatabaseField
     private String mapTo;
+
+    public TagParam() {
+    }
+
+    public TagParam(String name, String mapTo) {
+        this.name = name;
+        this.mapTo = mapTo;
+    }
+
+    public static TagParam fromTagDto(TagDto tagDto) {
+        return Optional.ofNullable(tagDto)
+                .map(dto -> new TagParam(dto.getName(), dto.getMapTo()))
+                .orElse(null);
+    }
 }
