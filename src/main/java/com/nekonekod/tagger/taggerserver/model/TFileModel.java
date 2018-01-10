@@ -5,7 +5,7 @@ import com.nekonekod.tagger.taggerserver.util.TagFormat;
 import lombok.Builder;
 import lombok.Data;
 
-import java.nio.file.Path;
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -32,11 +32,13 @@ public class TFileModel {
     private Integer fav;
 
 
-    public static TFileModel fromIllustAndPath(IllustEntity illust, Path path) {
-        if (Objects.isNull(illust) || Objects.isNull(path)) return null;
+    public static TFileModel fromIllustAndPath(IllustEntity illust, String fPath) {
+        if (Objects.isNull(illust) || Objects.isNull(fPath)) return null;
+        File file = new File(fPath);
+        if (!(file.exists() && file.isFile())) return null;
         return TFileModel.builder()
-                .fileName(path.toFile().getName())
-                .path(path.toString())
+                .fileName(file.getName())
+                .path(fPath)
                 .illustId(illust.getId())
                 .source(illust.getSource())
                 .sourceId(illust.getSourceId())

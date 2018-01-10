@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -21,7 +20,7 @@ public class FsWatcherTest {
     public void testWatcher() throws IOException {
         FsWatcher fsWatcher = FsWatcher.getInstance();
         fsWatcher.registerDir(new File("/Users/nekod/Downloads"));
-        List<Path> result = fsWatcher.search("微软");
+        List<String> result = fsWatcher.search("微软");
         System.out.println(JSONObject.toJSONString(result));
     }
 

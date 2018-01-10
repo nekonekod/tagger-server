@@ -11,6 +11,7 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +41,7 @@ public class FsWatcher {
     private WatchEvent.Modifier modifier = SensitivityWatchEventModifier.HIGH;
 
     private WatchService watcher;
-    private ConcurrentHashMap<Path, Set<Path>> dirs; //TODO key use string
+    private ConcurrentHashMap<String, Set<String>> dirs;
 
     private FsWatcher() {
         dirs = new ConcurrentHashMap<>(100);
@@ -64,32 +65,32 @@ public class FsWatcher {
         return SingletonHolder.INSTANCE.fsWatcher;
     }
 
-    public List<Path> search(String fileName) {
+    public List<String> search(String fileName) {
         if (StringUtil.isNullOrEmpty(fileName)) return Collections.emptyList();
         return Collections.list(dirs.keys())
                 .parallelStream()
-                .map(key -> fileSet(key).map(set -> set.stream().filter(path -> path.getFileName().toString().contains(fileName)).collect(Collectors.toList())).orElse(Collections.emptyList()))
+                .map(key -> fileSet(key).map(set -> set.stream().filter(path -> path.contains(fileName)).collect(Collectors.toList())).orElse(Collections.emptyList()))
                 .flatMap(List::stream)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
-    public List<Path> search(List<String> fileNames) {
-        return searchThenMap(fileNames, Function.identity(), (string, path) -> path);
+    public List<String> search(List<String> fileNames) {
+        return searchThenMap(fileNames, Function.identity(), (string, fPath) -> fPath);
     }
 
-    public <T, R> List<R> searchThenMap(List<T> src, Function<T, String> keyGen, BiFunction<T, Path, R> mapper) {
+    public <T, R> List<R> searchThenMap(List<T> src, Function<T, String> keyGen, BiFunction<T, String, R> mapper) {
         if (CollectionUtil.isEmpty(src)) return Collections.emptyList();
         return Collections.list(dirs.keys())
                 .parallelStream()
                 .map(key -> fileSet(key).map(set -> {
                     //dir并行查找其fileSet
-                    return set.stream().map(path -> {
+                    return set.stream().map(fPath -> {
                         // match any of fileNames
                         return src.stream().filter(t -> {
                             String fName = keyGen.apply(t);
-                            return path.getFileName().toString().contains(fName);
-                        }).findAny().map(t -> mapper.apply(t, path)).orElse(null);
+                            return fPath.contains(fName);
+                        }).findAny().map(t -> mapper.apply(t, fPath)).orElse(null);
                     }).filter(Objects::nonNull).collect(Collectors.toList());
                 }).orElse(Collections.emptyList()))
                 .flatMap(List::stream)
@@ -99,11 +100,10 @@ public class FsWatcher {
 
     public void registerDir(File dir) {
         if (Objects.nonNull(dir) && dir.exists() && dir.isDirectory()) {
-            ConcurrentSkipListSet<Path> files = new ConcurrentSkipListSet<>();
-            Path path = dir.toPath();
+            ConcurrentSkipListSet<String> files = new ConcurrentSkipListSet<>();
             try {
-                path.register(watcher, eventKinds, modifier);
-                dirs.put(path, files);
+                dir.toPath().register(watcher, eventKinds, modifier);
+                dirs.put(dir.getAbsolutePath(), files);
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
             }
@@ -111,7 +111,7 @@ public class FsWatcher {
             if (listFiles != null) {
                 Arrays.stream(listFiles).forEach(fileOrDir -> {
                     if (fileOrDir.exists() && fileOrDir.isFile()) {
-                        addFile(path, fileOrDir); //文件
+                        addFile(dir.getAbsolutePath(), fileOrDir); //文件
                     } else {
                         registerDir(fileOrDir); //文件夹
                     }
@@ -125,10 +125,8 @@ public class FsWatcher {
 
     public void unregisterDir(File dir) {
         if (Objects.nonNull(dir) && dir.exists() && dir.isDirectory()) {
-            File[] files = dir.listFiles();
-            if (files != null) Arrays.stream(files).forEach(this::removeDir);
-            removeDir(dir);
-            print();
+            String path = dir.getAbsolutePath();
+            Collections.list(dirs.keys()).stream().filter(key -> key.startsWith(path)).forEach(dirs::remove);
         } else {
             log.warn("{} 不是文件夹", dir);
         }
@@ -141,23 +139,7 @@ public class FsWatcher {
      * @return
      */
     public List<String> watchedDir() {
-        return Collections.list(dirs.keys()).stream().map(Path::toString).collect(Collectors.toList());
-    }
-
-    /**
-     * dirs中移除key，不遍历子文件夹
-     */
-    private void removeDir(File dir) {
-        if (Objects.nonNull(dir) && dir.exists() && dir.isDirectory()) {
-            Collections.list(dirs.keys())
-                    .stream()
-                    .filter(p -> p.toString().equals(dir.toPath().toString()))
-                    .findAny()
-                    .ifPresent(key -> {
-                        log.info("findAny key:{}", key);
-                        dirs.remove(key);
-                    });
-        }
+        return new ArrayList<>(Collections.list(dirs.keys()));
     }
 
     /**
@@ -166,9 +148,9 @@ public class FsWatcher {
      * @param dir
      * @param file
      */
-    private void addFile(Path dir, File file) {
+    private void addFile(String dir, File file) {
         if (Objects.nonNull(file) && file.exists() && file.isFile())
-            fileSet(dir).ifPresent(set -> set.add(file.toPath()));
+            fileSet(dir).ifPresent(set -> set.add(file.getAbsolutePath()));
     }
 
     /**
@@ -177,9 +159,13 @@ public class FsWatcher {
      * @param dir
      * @param file
      */
-    private void removeFile(Path dir, File file) {
-        if (Objects.nonNull(file) && file.exists() && file.isFile())
-            fileSet(dir).ifPresent(set -> set.remove(file.toPath()));
+    private void removeFile(String dir, File file) {
+        if (Objects.nonNull(file) && file.exists() && file.isFile()) {
+            if (StringUtil.isNullOrEmpty(dir)) {
+                dir = file.getParentFile().getAbsolutePath();
+            }
+            fileSet(dir).ifPresent(set -> set.remove(file.getAbsolutePath()));
+        }
     }
 
     private void watch() {
@@ -198,11 +184,11 @@ public class FsWatcher {
                     if (StandardWatchEventKinds.ENTRY_CREATE == kind) {
                         //创建
                         registerDir(file);
-                        addFile(parent, file);
+                        addFile(parent.toString(), file);
                     } else if (StandardWatchEventKinds.ENTRY_DELETE == kind) {
                         //删除
                         unregisterDir(file);
-                        removeFile(parent, file);
+                        removeFile(parent.toString(), file);
                     }
                 });
                 boolean valid = key.reset();
@@ -218,31 +204,20 @@ public class FsWatcher {
     }
 
     /**
-     * 是否监听此文件夹
-     *
-     * @param dir
-     * @return
-     */
-    private Optional<Path> isWatched(Path dir) {
-        if (Objects.isNull(dir)) return Optional.empty();
-        return Collections.list(dirs.keys()).stream().filter(p -> p.toString().equals(dir.toString())).findFirst();
-    }
-
-    /**
      * 如果监听此文件夹，则返回文件夹内的文件集合
      *
      * @param dir
      * @return
      */
-    private Optional<Set<Path>> fileSet(Path dir) {
-        return isWatched(dir).map(dirs::get);
+    private Optional<Set<String>> fileSet(String dir) {
+        return Optional.ofNullable(dirs.get(dir));
     }
 
     private void print() {
         StringBuilder builder = new StringBuilder();
         dirs.forEach((dir, files) -> {
-            String d = dir.toString() + "\n";
-            String f = "\t|-" + files.stream().map(Path::toString).collect(Collectors.joining("\n\t|-"));
+            String d = dir + "\n";
+            //String f = "\t|-" + files.stream().collect(Collectors.joining("\n\t|-"));
             builder.append(d);//.append(f);
         });
         log.info("\n============================\n" +
