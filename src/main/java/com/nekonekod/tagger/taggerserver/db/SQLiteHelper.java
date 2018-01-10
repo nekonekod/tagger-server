@@ -14,8 +14,6 @@ import com.j256.ormlite.table.TableUtils;
 import com.nekonekod.tagger.taggerserver.annotation.WhereField;
 import com.nekonekod.tagger.taggerserver.constant.QueryMatcher;
 import com.nekonekod.tagger.taggerserver.constant.QueryOperator;
-import com.nekonekod.tagger.taggerserver.entity.IllustEntity;
-import com.nekonekod.tagger.taggerserver.entity.TagEntity;
 import com.nekonekod.tagger.taggerserver.exception.BusiLogicException;
 import com.nekonekod.tagger.taggerserver.util.CollectionUtil;
 import com.nekonekod.tagger.taggerserver.util.MutableReference;
@@ -57,15 +55,17 @@ public class SQLiteHelper {
     public void init() {
         try {
             connectionSource = new JdbcPooledConnectionSource(databaseUrl);
-            install();
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
         }
     }
 
-    private void install() throws SQLException {
-        TableUtils.createTableIfNotExists(connectionSource, IllustEntity.class);
-        TableUtils.createTableIfNotExists(connectionSource, TagEntity.class);
+    public void createTableIfNotExists(Class<?> entityClass) {
+        try {
+            TableUtils.createTableIfNotExists(connectionSource, entityClass);
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     /**

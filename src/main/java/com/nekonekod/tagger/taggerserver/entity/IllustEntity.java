@@ -2,7 +2,9 @@ package com.nekonekod.tagger.taggerserver.entity;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
@@ -14,6 +16,8 @@ import java.util.Date;
  * @date 2018/1/2
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @DatabaseTable(tableName = "illust")
 public class IllustEntity {
 

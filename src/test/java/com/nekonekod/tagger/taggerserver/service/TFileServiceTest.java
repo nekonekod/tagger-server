@@ -13,7 +13,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -26,11 +25,14 @@ import java.util.List;
 public class TFileServiceTest {
 
     @Resource
+    private FsWatcher fsWatcher;
+
+    @Resource
     private TFileService tFileService;
 
     @Test
     public void queryTFile() throws Exception {
-        FsWatcher.getInstance().registerDir(Paths.get("/Users/nekod/Downloads/fs").toFile());
+        fsWatcher.registerDir(Paths.get("/Users/nekod/Downloads/fs").toFile());
         IllustQueryParam param = new IllustQueryParam();
 //        param.setSourceId("62491647");
 //        param.setTags(Arrays.asList("夕時雨"));

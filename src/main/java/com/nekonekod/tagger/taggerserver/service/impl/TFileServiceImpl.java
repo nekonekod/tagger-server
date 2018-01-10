@@ -21,13 +21,16 @@ import java.util.List;
 public class TFileServiceImpl implements TFileService {
 
     @Resource
+    private FsWatcher fsWatcher;
+
+    @Resource
     private IllustService illustService;
 
     @Override
     public List<TFileModel> queryTFile(IllustQueryParam param) {
         List<IllustEntity> illusts = illustService.query(param);
         log.info("queryTFile found {} illust records", illusts.size());
-        return FsWatcher.getInstance().searchThenMap(
+        return fsWatcher.searchThenMap(
                 illusts, //illust matched query
                 IllustEntity::getSourceId, //key for search
                 TFileModel::fromIllustAndPath); //build TFile

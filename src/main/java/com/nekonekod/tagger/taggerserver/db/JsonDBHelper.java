@@ -1,6 +1,5 @@
 package com.nekonekod.tagger.taggerserver.db;
 
-import com.nekonekod.tagger.taggerserver.entity.IllustCollection;
 import io.jsondb.JsonDBTemplate;
 
 import java.io.File;

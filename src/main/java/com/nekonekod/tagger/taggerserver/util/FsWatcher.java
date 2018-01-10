@@ -1,8 +1,11 @@
 package com.nekonekod.tagger.taggerserver.util;
 
+import com.nekonekod.tagger.taggerserver.service.ConfigService;
 import com.sun.nio.file.SensitivityWatchEventModifier;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -29,6 +32,7 @@ import java.util.stream.Collectors;
  * @date 2017/12/28
  */
 @Log4j2
+@Component
 public class FsWatcher {
 
     private volatile boolean finished = false;
@@ -43,7 +47,10 @@ public class FsWatcher {
     private WatchService watcher;
     private ConcurrentHashMap<String, Set<String>> dirs;
 
-    private FsWatcher() {
+    @Resource
+    private ConfigService configService;
+
+    public FsWatcher() {
         dirs = new ConcurrentHashMap<>(100);
         try {
             watcher = FileSystems.getDefault().newWatchService();
@@ -55,15 +62,6 @@ public class FsWatcher {
         }
     }
 
-
-    /**
-     * Singleton
-     *
-     * @return
-     */
-    public static FsWatcher getInstance() {
-        return SingletonHolder.INSTANCE.fsWatcher;
-    }
 
     public List<String> search(String fileName) {
         if (StringUtil.isNullOrEmpty(fileName)) return Collections.emptyList();
@@ -149,8 +147,16 @@ public class FsWatcher {
      * @param file
      */
     private void addFile(String dir, File file) {
-        if (Objects.nonNull(file) && file.exists() && file.isFile())
+        if (Objects.nonNull(file) && file.exists() && file.isFile() && matchExt(file.getName()))
             fileSet(dir).ifPresent(set -> set.add(file.getAbsolutePath()));
+    }
+
+    private boolean matchExt(String filename) {
+        if (configService != null) {
+            List<String> exts = configService.fsWatcherExt();
+            return exts.isEmpty() || exts.stream().anyMatch(filename::endsWith);
+        }
+        return true;
     }
 
     /**

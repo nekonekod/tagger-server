@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.io.File;
 
 /**
@@ -17,11 +18,8 @@ import java.io.File;
 @RequestMapping("fs")
 public class FsController {
 
+    @Resource
     private FsWatcher fsWatcher;
-
-    public FsController() {
-        this.fsWatcher = FsWatcher.getInstance();
-    }
 
     @RequestMapping("watch/register")
     public Object register(@RequestBody PathDto pathDto) {

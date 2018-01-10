@@ -8,17 +8,21 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author duwenjun
- * @date 2018/1/9
+ * @date 2018/1/10
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@DatabaseTable(tableName = "tag")
-public class TagEntity {
+@DatabaseTable(tableName = "config")
+public class ConfigEntity {
 
     @DatabaseField(id = true)
     private String name;
     @DatabaseField
-    private String mapTo;
+    private String value;
+    @DatabaseField
+    private String desc;
+    @DatabaseField
+    private String extra;
 
 }
