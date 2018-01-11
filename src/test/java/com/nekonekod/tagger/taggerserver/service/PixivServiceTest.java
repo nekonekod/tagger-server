@@ -5,6 +5,7 @@ import com.nekonekod.tagger.taggerserver.constant.QueryOperator;
 import com.nekonekod.tagger.taggerserver.entity.IllustEntity;
 import com.nekonekod.tagger.taggerserver.model.IllustQueryParam;
 import com.nekonekod.tagger.taggerserver.util.FileUtil;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +24,7 @@ import java.util.List;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-//@Ignore
+@Ignore
 public class PixivServiceTest {
 
     @Resource

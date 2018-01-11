@@ -5,6 +5,8 @@ import com.nekonekod.tagger.taggerserver.util.StringUtil;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author duwenjun
@@ -25,13 +27,17 @@ public class IllustQueryDto {
 
 
     public boolean isEmptyCondition() {
-        return StringUtil.isNullOrEmpty(source) &&
+        boolean flag = StringUtil.isNullOrEmpty(source) &&
                 StringUtil.isNullOrEmpty(sourceId) &&
                 StringUtil.isNullOrEmpty(author) &&
                 StringUtil.isNullOrEmpty(authorId) &&
                 StringUtil.isNullOrEmpty(comment) &&
-                StringUtil.isNullOrEmpty(title) &&
-                CollectionUtil.isEmpty(tags) &&
-                CollectionUtil.isEmpty(fav);
+                StringUtil.isNullOrEmpty(title);
+        if (!flag) return false;
+        if (Objects.nonNull(tags))
+            tags = tags.stream().filter(StringUtil::notNullOrEmpty).collect(Collectors.toList());
+        if (Objects.nonNull(fav))
+            fav = fav.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        return CollectionUtil.isEmpty(tags) && CollectionUtil.isEmpty(fav);
     }
 }

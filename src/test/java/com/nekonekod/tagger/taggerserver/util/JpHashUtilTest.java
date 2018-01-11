@@ -1,5 +1,6 @@
 package com.nekonekod.tagger.taggerserver.util;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.nio.file.Paths;
@@ -8,6 +9,7 @@ import java.nio.file.Paths;
  * @author duwenjun
  * @date 2018/1/10
  */
+@Ignore
 public class JpHashUtilTest {
 
     @Test

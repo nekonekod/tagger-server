@@ -32,13 +32,13 @@ public class TFileServiceImpl implements TFileService {
         if (Objects.isNull(param)) return tFiles();
         List<IllustEntity> illusts = illustService.query(param);
         log.info("queryTFile found {} illust records", illusts.size());
-        List<TFileModel> tfiles = fsWatcher.matchAndMap(
+        List<TFileModel> tFiles = fsWatcher.matchAndMap(
                 illusts, //illust matched query
                 IllustEntity::getSourceId, //match: filename like sourceId
                 file -> null,//orElse: null
                 TFileModel::fromIllustAndFile);
-        log.info("tFiles found {} records", tfiles.size());
-        return tfiles; //build TFile from illust and file
+        log.info("tFiles found {} records", tFiles.size());
+        return tFiles; //build TFile from illust and file
     }
 
     @Override
