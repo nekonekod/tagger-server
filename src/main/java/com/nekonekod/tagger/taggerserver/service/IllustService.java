@@ -1,6 +1,5 @@
 package com.nekonekod.tagger.taggerserver.service;
 
-import com.nekonekod.tagger.taggerserver.constant.QueryOperator;
 import com.nekonekod.tagger.taggerserver.entity.IllustEntity;
 import com.nekonekod.tagger.taggerserver.model.IllustQueryParam;
 
@@ -26,6 +25,13 @@ public interface IllustService {
      * @return
      */
     List<IllustEntity> query(IllustQueryParam param);
+
+    /**
+     * find all
+     *
+     * @return
+     */
+    List<IllustEntity> queryAll();
 
     /**
      * remove all

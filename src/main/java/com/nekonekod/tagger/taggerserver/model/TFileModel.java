@@ -1,6 +1,7 @@
 package com.nekonekod.tagger.taggerserver.model;
 
 import com.nekonekod.tagger.taggerserver.entity.IllustEntity;
+import com.nekonekod.tagger.taggerserver.util.FileUtil;
 import com.nekonekod.tagger.taggerserver.util.TagFormat;
 import lombok.Builder;
 import lombok.Data;
@@ -32,13 +33,12 @@ public class TFileModel {
     private Integer fav;
 
 
-    public static TFileModel fromIllustAndPath(IllustEntity illust, String fPath) {
-        if (Objects.isNull(illust) || Objects.isNull(fPath)) return null;
-        File file = new File(fPath);
-        if (!(file.exists() && file.isFile())) return null;
+    public static TFileModel fromIllustAndFile(IllustEntity illust, File file) {
+        if (Objects.isNull(illust)) return fromFile(file);
+        if (!FileUtil.isValidFile(file)) return null;
         return TFileModel.builder()
                 .fileName(file.getName())
-                .path(fPath)
+                .path(file.getAbsolutePath())
                 .illustId(illust.getId())
                 .source(illust.getSource())
                 .sourceId(illust.getSourceId())
@@ -48,6 +48,14 @@ public class TFileModel {
                 .updateTime(illust.getUpdateTime())
                 .comment(illust.getComment())
                 .title(illust.getTitle())
+                .build();
+    }
+
+    public static TFileModel fromFile(File file) {
+        if (!FileUtil.isValidFile(file)) return null;
+        return TFileModel.builder()
+                .fileName(file.getName())
+                .path(file.getAbsolutePath())
                 .build();
     }
 }

@@ -75,6 +75,16 @@ public class IllustServiceImpl implements IllustService {
     }
 
     @Override
+    public List<IllustEntity> queryAll() {
+        try {
+            return illustDao.queryForAll();
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            throw BusiLogicException.create(e);
+        }
+    }
+
+    @Override
     public void removeAll() {
         try {
             illustDao.deleteBuilder().delete();

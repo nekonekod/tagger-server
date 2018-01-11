@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author duwenjun
@@ -28,13 +29,29 @@ public class TFileServiceImpl implements TFileService {
 
     @Override
     public List<TFileModel> queryTFile(IllustQueryParam param) {
+        if (Objects.isNull(param)) return tFiles();
         List<IllustEntity> illusts = illustService.query(param);
         log.info("queryTFile found {} illust records", illusts.size());
-        return fsWatcher.searchThenMap(
+        List<TFileModel> tfiles = fsWatcher.matchAndMap(
                 illusts, //illust matched query
-                IllustEntity::getSourceId, //key for search
-                TFileModel::fromIllustAndPath); //build TFile
+                IllustEntity::getSourceId, //match: filename like sourceId
+                file -> null,//orElse: null
+                TFileModel::fromIllustAndFile);
+        log.info("tFiles found {} records", tfiles.size());
+        return tfiles; //build TFile from illust and file
     }
 
+    @Override
+    public List<TFileModel> tFiles() {
+        List<IllustEntity> illusts = illustService.queryAll();
+        log.info("tFiles found {} illust records", illusts.size());
+        List<TFileModel> tfiles = fsWatcher.matchAndMap(
+                illusts, //illust matched query
+                IllustEntity::getSourceId, //match
+                TFileModel::fromFile,//orElse: build TFile from file
+                TFileModel::fromIllustAndFile);
+        log.info("tFiles found {} records", tfiles.size());
+        return tfiles; //build TFile
+    }
 
 }

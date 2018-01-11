@@ -62,22 +62,48 @@ public class FsWatcher {
         }
     }
 
+    /**
+     * watched files
+     *
+     * @return absolute path
+     */
+    public List<String> allFiles() {
+        return dirs.values().stream().flatMap(Set::stream).collect(Collectors.toList());
+    }
 
+    /**
+     * watched files whose filename contains %fileName%
+     *
+     * @param fileName
+     * @return absolute path
+     */
     public List<String> search(String fileName) {
-        if (StringUtil.isNullOrEmpty(fileName)) return Collections.emptyList();
-        return Collections.list(dirs.keys())
-                .parallelStream()
-                .map(key -> fileSet(key).map(set -> set.stream().filter(path -> path.contains(fileName)).collect(Collectors.toList())).orElse(Collections.emptyList()))
-                .flatMap(List::stream)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        return search(Collections.singletonList(fileName));
     }
 
+    /**
+     * watched files whose filename contains %fileNames%
+     *
+     * @param fileNames
+     * @return absolute path
+     */
     public List<String> search(List<String> fileNames) {
-        return searchThenMap(fileNames, Function.identity(), (string, fPath) -> fPath);
+        return matchAndMap(fileNames, Function.identity(), file -> null, (string, file) -> file.getAbsolutePath());
     }
 
-    public <T, R> List<R> searchThenMap(List<T> src, Function<T, String> keyGen, BiFunction<T, String, R> mapper) {
+    /**
+     * match files whose name contains keyGen(T)
+     * then mapTo R type
+     * if not match ,use orElse(fPath)
+     *
+     * @param src
+     * @param keyGen
+     * @param mapper
+     * @param <T>
+     * @param <R>
+     * @return
+     */
+    public <T, R> List<R> matchAndMap(List<T> src, Function<T, String> keyGen, Function<File, R> orElse, BiFunction<T, File, R> mapper) {
         if (CollectionUtil.isEmpty(src)) return Collections.emptyList();
         return Collections.list(dirs.keys())
                 .parallelStream()
@@ -85,10 +111,12 @@ public class FsWatcher {
                     //dir并行查找其fileSet
                     return set.stream().map(fPath -> {
                         // match any of fileNames
-                        return src.stream().filter(t -> {
-                            String fName = keyGen.apply(t);
-                            return fPath.contains(fName);
-                        }).findAny().map(t -> mapper.apply(t, fPath)).orElse(null);
+                        File file = new File(fPath);
+                        return !FileUtil.isValidFile(file) ? null :
+                                src.stream().filter(t -> {
+                                    String fName = keyGen.apply(t);
+                                    return file.getName().contains(fName);
+                                }).findAny().map(t -> mapper.apply(t, file)).orElse(orElse.apply(file));
                     }).filter(Objects::nonNull).collect(Collectors.toList());
                 }).orElse(Collections.emptyList()))
                 .flatMap(List::stream)

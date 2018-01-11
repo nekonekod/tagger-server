@@ -40,6 +40,7 @@ public class IllustQueryParam {
     private QueryOperator operator;
 
     public static IllustQueryParam fromIllustQueryDto(IllustQueryDto dto) {
+        if (Objects.isNull(dto) || dto.isEmptyCondition()) return null;
         IllustQueryParam param = new IllustQueryParam();
         param.source = StringUtil.trimToNull(dto.getSource());
         param.sourceId = StringUtil.trimToNull(dto.getSourceId());

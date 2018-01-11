@@ -15,6 +15,10 @@ public class FileUtil extends FileUtils {
         return Objects.nonNull(dir) && dir.exists() && dir.isDirectory();
     }
 
+    public static boolean isValidFile(File file) {
+        return Objects.nonNull(file) && file.exists() && file.isFile();
+    }
+
     public static boolean isEmptyDir(File file) {
         if (isValidDir(file)) return false;
         File[] files = file.listFiles();

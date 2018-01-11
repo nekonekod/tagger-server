@@ -20,4 +20,6 @@ public interface TFileService {
      * @return
      */
     List<TFileModel> queryTFile(IllustQueryParam param);
+
+    List<TFileModel> tFiles();
 }
